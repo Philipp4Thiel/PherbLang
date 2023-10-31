@@ -1,0 +1,4 @@
+package Ast
+
+trait AstNode {
+}
