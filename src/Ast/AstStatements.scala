@@ -17,6 +17,6 @@ case class AstPrint(expr: AstExpr) extends AstStatement {
     println(s"${expr.eval(env)}")
     env
   }
-  override def toString: String = s"print($expr)"
+  override def toString: String = s"print $expr"
 }
 

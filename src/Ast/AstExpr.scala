@@ -75,23 +75,34 @@ case class AstExprVar(name: String) extends AstExpr {
   override def toString: String = name
 }
 
-case class AstExprLambda(name: String, body: AstExpr, var envAtFirstEval: Option[AstEnv] = None) extends AstExpr {
+case class AstExprLambda(name: String, body: AstExpr, capturedVariables: Set[String] = Set()) extends AstExpr {
+  var capturedValues: Map[String, AstExpr] = Map()
   override def eval(env: AstEnv): AstExpr = {
-    if (envAtFirstEval.isEmpty) {
-      envAtFirstEval = Some(env)
+    if capturedValues.isEmpty && capturedVariables.nonEmpty then {
+      capturedValues = capturedVariables.map(v => (v, env(v))).toMap
     }
-    AstExprLambda(name, body.eval(envAtFirstEval.get), envAtFirstEval)
+    AstExprLambda(name, body, capturedVariables)
   }
 
-  override def toString: String = s"\\$name.$body"
+  def eval(env: AstEnv, arg: AstExpr): AstExpr = {
+    // override values in env with captured values
+    val newEnv = env ++ capturedValues + (name -> arg)
+    body.eval(newEnv)
+  }
+
+  override def toString: String = s"\\$name.($body {${capturedVariables.mkString(",")}})"
 }
 
 case class AstExprApp(lam: AstExpr, arg: AstExpr) extends AstExpr {
   override def eval(env: AstEnv): AstExpr = {
-    val l = lam.eval(env).asInstanceOf[AstExprLambda]
+    val expr = lam.eval(env)
+    val l: AstExprLambda = expr match {
+      case AstExprLambda(_,_,_) => expr.asInstanceOf[AstExprLambda]
+      case AstExprVar(name) => return this
+      case expr => throw new EvalException(s"$expr is not a lambda expression")
+    }
     val a = arg.eval(env)
-    val e = l.envAtFirstEval.get.foldLeft(env)((acc, kv) => acc + kv)
-    val res = l.body.eval(e + (l.name -> a))
+    val res = l.eval(env, a)
     res
   }
 

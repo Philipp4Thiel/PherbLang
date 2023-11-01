@@ -3,8 +3,15 @@ import TypeChecker.*
 @main
 def main(): Unit = {
   val prog = AstProgram(List(
-    AstAssignment("add", AstExprLambda("y", AstExprLambda("z",AstExprBinOp(BinOp.Add, AstExprVar("y"), AstExprVar("z"))))),
-    AstAssignment("a", AstExprBinOp(BinOp.Add, AstExprConst(1), AstExprApp(AstExprApp(AstExprVar("add"), AstExprConst(2)), AstExprConst(3)))),
+    // let apply = \f.\x.f x
+    AstAssignment("apply", AstExprLambda("f",AstExprLambda("x", AstExprApp(AstExprVar("f"), AstExprVar("x")),Set("f")))),
+    // let id = \x.x
+    AstAssignment("id", AstExprLambda("x", AstExprVar("x"))),
+    // let res = apply id 42
+    // AstAssignment("res", AstExprApp(AstExprApp(AstExprVar("apply"), AstExprVar("id")), AstExprConst(42))),
+    AstAssignment("res", AstExprApp(AstExprVar("apply"), AstExprConst(42))),
+    // print res
+    AstPrint(AstExprVar("res"))
   ))
 
 
@@ -17,6 +24,6 @@ def main(): Unit = {
       println(s"- $err")
   println()
 
-  //prog.printAndEval()
-  prog.eval()
+  prog.printAndEval()
+  //prog.eval()
 }

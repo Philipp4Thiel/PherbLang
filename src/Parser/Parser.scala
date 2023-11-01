@@ -9,6 +9,6 @@ class Parser {
     expression ::= term | expression op term | "(" expression ")" | "-" expression | lambda
     term ::= ident | number
     op ::= "+" | "-" | "*" | "/" | "<" | ">" | "==" | "!=" | "<=" | ">=" | "&&" | "||"
-    lambda ::= "\" ident "." expression
+    lambda ::= "\" ident "[" ident "]" "." expression
    */
 }
