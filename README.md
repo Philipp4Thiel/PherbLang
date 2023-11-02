@@ -15,9 +15,8 @@ ok these bug-chainreactions are getting annoying, time to actually plan ahead.
 
 ## Grammer of PherbLang
 ```
-program = { statement | comment }
+program = { statement }
  
-comment = "//" { any character except "\n" } "\n"
 statement = declaration | assignment | printStatement ";"
 
 declaration = "let" IDENTIFIER ":" type "=" expression 

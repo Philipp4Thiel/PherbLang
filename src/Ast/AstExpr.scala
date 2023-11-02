@@ -90,7 +90,7 @@ case class AstExprLambda(name: String, body: AstExpr, capturedVariables: Set[Str
     body.eval(newEnv)
   }
 
-  override def toString: String = s"\\$name.($body {${capturedVariables.mkString(",")}})"
+  override def toString: String = s"\\$name.($body {${capturedValues.mkString(",")}}"
 }
 
 case class AstExprApp(lam: AstExpr, arg: AstExpr) extends AstExpr {
